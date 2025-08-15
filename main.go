@@ -144,7 +144,6 @@ func listUsage() {
 }
 
 func main() {
-	// Check for version flags first
 	for _, arg := range os.Args[1:] {
 		if arg == "-v" || arg == "-version" {
 			fmt.Printf("railgen version %s\n", version)
