@@ -16,6 +16,8 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
+const version = "0.0.1"
+
 type TestData struct {
 	PackageName    string
 	TestName       string
@@ -78,7 +80,7 @@ var (
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "RailGen - Generate test rails from OpenAPI specification\n\n")
+	fmt.Fprintf(os.Stderr, "railgen - Generate test rails from OpenAPI specification\n\n")
 	fmt.Fprintf(os.Stderr, "A CLI tool to generate Go test files from OpenAPI operation IDs\n\n")
 	fmt.Fprintf(os.Stderr, "Usage:\n")
 	fmt.Fprintf(os.Stderr, "  %s <command> [flags]\n\n", os.Args[0])
@@ -87,6 +89,8 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "  delete      Delete test files for operation ID\n")
 	fmt.Fprintf(os.Stderr, "  list        List operation IDs and their implementation status\n")
 	fmt.Fprintf(os.Stderr, "  help        Show help for commands\n\n")
+	fmt.Fprintf(os.Stderr, "Global Flags:\n")
+	fmt.Fprintf(os.Stderr, "  -v, -version    Show version information\n\n")
 	fmt.Fprintf(os.Stderr, "Use \"%s <command> -h\" for more information about a command.\n", os.Args[0])
 }
 
@@ -140,6 +144,14 @@ func listUsage() {
 }
 
 func main() {
+	// Check for version flags first
+	for _, arg := range os.Args[1:] {
+		if arg == "-v" || arg == "-version" {
+			fmt.Printf("railgen version %s\n", version)
+			os.Exit(0)
+		}
+	}
+
 	if len(os.Args) < 2 {
 		usage()
 		os.Exit(1)

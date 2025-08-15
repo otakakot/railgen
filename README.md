@@ -1,4 +1,4 @@
-# RailGen
+# railgen
 
 A CLI tool for automatically generating Go test files from OpenAPI specifications.
 
@@ -25,7 +25,7 @@ go install github.com/otakakot/railgen@latest
 
 ### Commands
 
-RailGen supports the following commands:
+railgen supports the following commands:
 
 - `generate`: Generate test files from OpenAPI operationId
 - `delete`: Delete test files for specified operationId
@@ -126,7 +126,7 @@ railgen list --help
 
 ## Custom Comment Files
 
-RailGen allows you to use custom comment files to insert your own TODO comments into generated test files.
+railgen allows you to use custom comment files to insert your own TODO comments into generated test files.
 
 ### Creating Comment Files
 
@@ -158,7 +158,7 @@ railgen generate -o addPet -c comments.txt
 
 ## Existing File Protection and Backup
 
-RailGen provides the following features to prevent accidental overwriting of existing test files:
+railgen provides the following features to prevent accidental overwriting of existing test files:
 
 ### Existing File Check
 
