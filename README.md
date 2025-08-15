@@ -2,6 +2,12 @@
 
 A CLI tool for automatically generating Go test files from OpenAPI specifications.
 
+## Install
+
+```shell
+go install github.com/otakakot/railgen@latest
+```
+
 ## Features
 
 - Generate test files from OpenAPI 3.0 specifications by specifying operationId
