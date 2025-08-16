@@ -94,23 +94,27 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "Use \"%s <command> -h\" for more information about a command.\n", os.Args[0])
 }
 
+func printCommonFlags() {
+	fmt.Fprintf(os.Stderr, "  -h, -help\n")
+	fmt.Fprintf(os.Stderr, "        Show this help message\n")
+	fmt.Fprintf(os.Stderr, "  -f, -file string\n")
+	fmt.Fprintf(os.Stderr, "        OpenAPI specification file (default \"openapi.yaml\")\n")
+	fmt.Fprintf(os.Stderr, "  -d, -output string\n")
+	fmt.Fprintf(os.Stderr, "        Output directory for generated tests (default \"test\")\n")
+}
+
 func generateUsage() {
 	fmt.Fprintf(os.Stderr, "Generate test files from OpenAPI operation ID\n\n")
 	fmt.Fprintf(os.Stderr, "Usage:\n")
 	fmt.Fprintf(os.Stderr, "  %s generate [flags]\n\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "Flags:\n")
-	fmt.Fprintf(os.Stderr, "  -f, -file string\n")
-	fmt.Fprintf(os.Stderr, "        OpenAPI specification file (default \"openapi.yaml\")\n")
+	printCommonFlags()
 	fmt.Fprintf(os.Stderr, "  -o, -operation string\n")
 	fmt.Fprintf(os.Stderr, "        Operation ID to generate test for\n")
-	fmt.Fprintf(os.Stderr, "  -d, -output string\n")
-	fmt.Fprintf(os.Stderr, "        Output directory for generated tests (default \"test\")\n")
 	fmt.Fprintf(os.Stderr, "  -c, -comments string\n")
 	fmt.Fprintf(os.Stderr, "        Comments file to include custom TODO comments\n")
 	fmt.Fprintf(os.Stderr, "  --overwrite\n")
 	fmt.Fprintf(os.Stderr, "        Overwrite existing test file (creates backup)\n")
-	fmt.Fprintf(os.Stderr, "  -h, --help\n")
-	fmt.Fprintf(os.Stderr, "        Show this help message\n")
 }
 
 func deleteUsage() {
@@ -118,14 +122,9 @@ func deleteUsage() {
 	fmt.Fprintf(os.Stderr, "Usage:\n")
 	fmt.Fprintf(os.Stderr, "  %s delete [flags]\n\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "Flags:\n")
-	fmt.Fprintf(os.Stderr, "  -f, -file string\n")
-	fmt.Fprintf(os.Stderr, "        OpenAPI specification file (default \"openapi.yaml\")\n")
+	printCommonFlags()
 	fmt.Fprintf(os.Stderr, "  -o, -operation string\n")
 	fmt.Fprintf(os.Stderr, "        Operation ID to delete test for\n")
-	fmt.Fprintf(os.Stderr, "  -d, -output string\n")
-	fmt.Fprintf(os.Stderr, "        Output directory for generated tests (default \"test\")\n")
-	fmt.Fprintf(os.Stderr, "  -h, --help\n")
-	fmt.Fprintf(os.Stderr, "        Show this help message\n")
 }
 
 func listUsage() {
@@ -133,14 +132,9 @@ func listUsage() {
 	fmt.Fprintf(os.Stderr, "Usage:\n")
 	fmt.Fprintf(os.Stderr, "  %s list [flags]\n\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "Flags:\n")
-	fmt.Fprintf(os.Stderr, "  -f, -file string\n")
-	fmt.Fprintf(os.Stderr, "        OpenAPI specification file (default \"openapi.yaml\")\n")
-	fmt.Fprintf(os.Stderr, "  -d, -output string\n")
-	fmt.Fprintf(os.Stderr, "        Output directory for generated tests (default \"test\")\n")
+	printCommonFlags()
 	fmt.Fprintf(os.Stderr, "  --unimplemented\n")
 	fmt.Fprintf(os.Stderr, "        Show only unimplemented operation IDs\n")
-	fmt.Fprintf(os.Stderr, "  -h, --help\n")
-	fmt.Fprintf(os.Stderr, "        Show this help message\n")
 }
 
 func main() {
@@ -165,7 +159,7 @@ func main() {
 		handleDelete()
 	case "list":
 		handleList()
-	case "help", "-h", "--help":
+	case "help", "-h", "-help":
 		usage()
 		os.Exit(0)
 	default:
@@ -236,15 +230,19 @@ func handleList() {
 	}
 }
 
-func initGenerateFlags(fs *flag.FlagSet) {
+func initCommonFlags(fs *flag.FlagSet) {
 	openapiFile = fs.String("f", "openapi.yaml", "OpenAPI specification file")
 	fs.StringVar(openapiFile, "file", "openapi.yaml", "OpenAPI specification file")
 
-	operationID = fs.String("o", "", "Operation ID to generate test for")
-	fs.StringVar(operationID, "operation", "", "Operation ID to generate test for")
-
 	outputDir = fs.String("d", "test", "Output directory for generated tests")
 	fs.StringVar(outputDir, "output", "test", "Output directory for generated tests")
+}
+
+func initGenerateFlags(fs *flag.FlagSet) {
+	initCommonFlags(fs)
+
+	operationID = fs.String("o", "", "Operation ID to generate test for")
+	fs.StringVar(operationID, "operation", "", "Operation ID to generate test for")
 
 	commentsFile = fs.String("c", "", "Comments file to include custom TODO comments")
 	fs.StringVar(commentsFile, "comments", "", "Comments file to include custom TODO comments")
@@ -253,22 +251,14 @@ func initGenerateFlags(fs *flag.FlagSet) {
 }
 
 func initDeleteFlags(fs *flag.FlagSet) {
-	openapiFile = fs.String("f", "openapi.yaml", "OpenAPI specification file")
-	fs.StringVar(openapiFile, "file", "openapi.yaml", "OpenAPI specification file")
+	initCommonFlags(fs)
 
 	operationID = fs.String("o", "", "Operation ID to delete test for")
 	fs.StringVar(operationID, "operation", "", "Operation ID to delete test for")
-
-	outputDir = fs.String("d", "test", "Output directory for generated tests")
-	fs.StringVar(outputDir, "output", "test", "Output directory for generated tests")
 }
 
 func initListFlags(fs *flag.FlagSet, unimplementedOnly *bool) {
-	openapiFile = fs.String("f", "openapi.yaml", "OpenAPI specification file")
-	fs.StringVar(openapiFile, "file", "openapi.yaml", "OpenAPI specification file")
-
-	outputDir = fs.String("d", "test", "Output directory for generated tests")
-	fs.StringVar(outputDir, "output", "test", "Output directory for generated tests")
+	initCommonFlags(fs)
 
 	fs.BoolVar(unimplementedOnly, "unimplemented", false, "Show only unimplemented operation IDs")
 }
