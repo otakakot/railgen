@@ -72,11 +72,12 @@ func {{.TestName}}(t *testing.T) {
 `
 
 var (
-	openapiFile  *string
-	operationID  *string
-	outputDir    *string
-	commentsFile *string
-	overwrite    *bool
+	openapiFile       *string
+	operationID       *string
+	outputDir         *string
+	commentsFile      *string
+	overwrite         *bool
+	unimplementedOnly *bool
 )
 
 func usage() {
@@ -184,7 +185,7 @@ func handleGenerate() {
 		os.Exit(1)
 	}
 
-	if err := generateTest(); err != nil {
+	if err := generateTest(*overwrite); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -213,8 +214,7 @@ func handleList() {
 	listFlagSet := flag.NewFlagSet("list", flag.ExitOnError)
 	listFlagSet.Usage = listUsage
 
-	var unimplementedOnly bool
-	initListFlags(listFlagSet, &unimplementedOnly)
+	initListFlags(listFlagSet)
 	if err := listFlagSet.Parse(os.Args[2:]); err != nil {
 		os.Exit(1)
 	}
@@ -225,7 +225,7 @@ func handleList() {
 		os.Exit(1)
 	}
 
-	if err := listOperations(unimplementedOnly); err != nil {
+	if err := listOperations(*unimplementedOnly); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -257,13 +257,12 @@ func initDeleteFlags(fs *flag.FlagSet) {
 	fs.StringVar(operationID, "operation", "", "Operation ID to delete test for")
 }
 
-func initListFlags(fs *flag.FlagSet, unimplementedOnly *bool) {
+func initListFlags(fs *flag.FlagSet) {
 	initCommonFlags(fs)
-
-	fs.BoolVar(unimplementedOnly, "unimplemented", false, "Show only unimplemented operation IDs")
+	unimplementedOnly = fs.Bool("unimplemented", false, "Show only unimplemented operation IDs")
 }
 
-func generateTest() error {
+func generateTest(overwrite bool) error {
 	loader := openapi3.NewLoader()
 	doc, err := loader.LoadFromFile(*openapiFile)
 	if err != nil {
@@ -351,7 +350,7 @@ func generateTest() error {
 	filePath := filepath.Join(tagDir, fileName)
 
 	if _, err := os.Stat(filePath); err == nil {
-		if !*overwrite {
+		if !overwrite {
 			return fmt.Errorf("test file already exists: %s\nUse --overwrite to overwrite the existing file", filePath)
 		}
 
