@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"sort"
 	"strings"
 	"text/template"
@@ -16,7 +17,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
-const version = "0.0.1"
+var version string
 
 type TestData struct {
 	PackageName    string
@@ -141,7 +142,7 @@ func listUsage() {
 func main() {
 	for _, arg := range os.Args[1:] {
 		if arg == "-v" || arg == "-version" {
-			fmt.Printf("railgen version %s\n", version)
+			printVersion()
 			os.Exit(0)
 		}
 	}
@@ -168,6 +169,16 @@ func main() {
 		usage()
 		os.Exit(1)
 	}
+}
+
+func printVersion() {
+	if version == "" {
+		if bi, ok := debug.ReadBuildInfo(); ok {
+			version = bi.Main.Version
+		}
+	}
+
+	fmt.Printf("railgen version %s\n", version)
 }
 
 func handleGenerate() {
